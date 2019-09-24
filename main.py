@@ -8,6 +8,9 @@ def parse_args():
     """ Arguments parser. """
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--debug", help="Toggle debug mode", action='store_true')
+    parser.add_argument("-p", "--path", help="Path to the input map", type=str, default="test.png")
+    parser.add_argument("-x", "--width", help="Width of the final ASCII map", type=int, default=100)
+    parser.add_argument("-y", "--height", help="Height of the final ASCII map", type=int, default=100)
     args = parser.parse_args()
 
     return args
@@ -52,10 +55,8 @@ def get_edges(img, debug):
 
     return erosion
 
-def edges_to_ascii(edges, debug):
+def edges_to_ascii(edges, w, h, debug):
     # map final size
-    w = 150
-    h = 150
     ascii_map = np.empty((h, w), dtype='str')
     ascii_map[:] = ' '
 
@@ -91,9 +92,9 @@ def edges_to_ascii(edges, debug):
 
 def main(args):
     # Load image
-    img = cv2.imread('test.png')
+    img = cv2.imread(args.path)
     img_edges = get_edges(img, args.debug)
-    ascii_map = edges_to_ascii(img_edges, args.debug)
+    ascii_map = edges_to_ascii(img_edges, args.width, args.height, args.debug)
 
 
 
