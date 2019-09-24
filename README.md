@@ -16,3 +16,4 @@ Generates ASCII maps from regular Google (or any other provider) maps. Just run 
 
 ### TODO:
   * Query maps API to get the image
+  * Other characters than # for the ASCII map
