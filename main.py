@@ -15,7 +15,12 @@ def parse_args():
 
     return args
 
-def get_edges(img, debug):
+def get_binarised(img, debug):
+
+    if debug:
+        cv2.imshow("Original image", img)
+        cv2.waitKey(0)
+
     # Convert to gray levels
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     if debug:
@@ -24,38 +29,15 @@ def get_edges(img, debug):
 
     # Binarise (manual threshold)
     # Otsu erases buildings, so manula thresholding for now
-    thres, img =  cv2.threshold(img, 215, 255, cv2.THRESH_BINARY)
+    thres, img =  cv2.threshold(img, 225, 255, cv2.THRESH_BINARY)
 
     if debug:
         cv2.imshow("Binarised Image", img)
         cv2.waitKey(0)
 
-    # Get edges
-    edges = cv2.Canny(img,75,255)
+    return img
 
-    if debug:
-        cv2.imshow("Edges", edges)
-        cv2.waitKey(0)
-
-    # Morpho
-    kernel = np.ones((2,2),np.uint8)
-    dilate = cv2.dilate(edges, kernel, iterations = 1)
-
-    if debug:
-        cv2.imshow("Dilated", dilate)
-        cv2.waitKey(0)
-
-    kernel = np.ones((3,3),np.uint8)
-    erosion = cv2.dilate(dilate, kernel, iterations = 1)
-
-    if debug:
-        cv2.imshow("Eroded", erosion)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-
-    return erosion
-
-def edges_to_ascii(edges, w, h, debug):
+def binarised_to_ascii(edges, w, h, debug):
     # map final size
     ascii_map = np.empty((h, w), dtype='str')
     ascii_map[:] = ' '
@@ -69,7 +51,7 @@ def edges_to_ascii(edges, w, h, debug):
     for y in range(h):
         for x in range(w):
             if np.count_nonzero(edges[x*br:(x*br)+br, y*bc:(y*bc)+bc]) > pixel_threshold:
-                ascii_map[y,x] = '#'
+                ascii_map[y,x] = '.'
 
     if debug:
         libtcod.console_set_custom_font('Anikki_square_8x8.png', libtcod.FONT_LAYOUT_ASCII_INROW)
@@ -93,8 +75,8 @@ def edges_to_ascii(edges, w, h, debug):
 def main(args):
     # Load image
     img = cv2.imread(args.path)
-    img_edges = get_edges(img, args.debug)
-    ascii_map = edges_to_ascii(img_edges, args.width, args.height, args.debug)
+    img_edges = get_binarised(img, args.debug)
+    ascii_map = binarised_to_ascii(img_edges, args.width, args.height, args.debug)
 
 
 
